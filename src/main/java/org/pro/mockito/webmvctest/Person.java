@@ -19,8 +19,10 @@ public class Person {
     private int id;
 
     @Column(name = "name")
+    @Size(min = 2,max = 40,message = "error")
     private String name;
     @Column(name = "surname")
+    @Size(min = 2,max = 20,message = "error")
     private String surname;
     @Column(name = "age")
     private int age;
