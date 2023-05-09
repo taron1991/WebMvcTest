@@ -43,4 +43,12 @@ public class PersonController {
     public void deletePersonById(@RequestParam("id") int id){
         serviceLayer.deletePersonById(id);
     }
+    
+    @PutMapping("/update/{id}")
+    public Person update(@Valid @RequestBody PersonDto personDto, @PathVariable("id") int id, BindingResult bindingResult){
+        if(bindingResult.hasErrors()){
+            throw new RuntimeException();
+        }
+        return serviceLayer.updatePerson(personDto,id);
+    }
 }
