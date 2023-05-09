@@ -31,6 +31,9 @@ class PersonControllerTest {
 
     @MockBean
     ServiceLayer serviceLayer;
+    
+    @MockBean
+    RepositoryLayer repositoryLayer;
 
 
     @Test
@@ -78,6 +81,18 @@ class PersonControllerTest {
         mockMvc.perform(delete("/api/person/delById?id=9").contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(person)))
                 .andExpect(status().isOk());
+        
+        /*через requestparam*/
+
+       /* mockMvc.perform(delete("/api/person/delById?id=9").contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(person)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("karos"));*/
+
+
+        /* only when method is void
+        mockMvc.perform(delete("/api/person/delById/{id}",9).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());*/
 
     }
 
@@ -89,6 +104,26 @@ class PersonControllerTest {
         mockMvc.perform(get("/api/person/ByName/{name}","Igor").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.surname").value("Vdovin"));
+    }
+    
+    
+     @Test
+    void updateTestMethodfirstVariant2() throws Exception {
+
+       Person person = new Person(1,"Spring Boot @WebMvcTest", "Description", 18);
+
+        PersonDto updated = new PersonDto( "Updated", "Updated", 19);
+
+        when(repositoryLayer.save(person)).thenReturn(person);
+        when(serviceLayer.updatePerson(updated,1)).thenReturn(new Person(updated.getName(),
+                updated.getSurname(),updated.getAge()));
+
+        mockMvc.perform(put("/api/person/update/{id}", 1).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(updated)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", Matchers.is("Updated")))
+                .andExpect(jsonPath("$.surname").value("Updated"))
+                .andExpect(jsonPath("$.age").value(19)).andDo(print());
     }
 
 }
